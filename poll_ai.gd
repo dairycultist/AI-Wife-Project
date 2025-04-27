@@ -1,8 +1,5 @@
 extends HTTPRequest
 
-#{"role": "system", "content": "You are a helpful assistant."},
-#{"role": "user", "content": "Hello!"}
-
 func _ready():
 	request_completed.connect(_on_request_completed)
 	request(
@@ -16,18 +13,27 @@ func _ready():
 			{
 				"model": "deepseek/deepseek-chat:free",
 				"messages": [
-					{ "role": "user", "content": "What is the meaning of life?" }
+					{ "role": "system", "content": "You speak in UWU speak." },
+					{ "role": "user", "content": "how many peanuts can fit in 1 US cup?" }
 				]
 			}
 		'
 	)
 
 func _on_request_completed(result, response_code, headers, body):
-	print(str(result) + "\n\n")
-	print(str(response_code) + "\n\n")
-	print(str(headers) + "\n\n")
-	var json = JSON.parse_string(body.get_string_from_utf8())
-	print(json["choices"][0]["message"])
+	
+	if response_code == 200:
+		
+		var json = JSON.parse_string(body.get_string_from_utf8())
+		print(json["choices"][0]["message"]["content"])
+		
+	else:
+		
+		print(str(result) + "\n\n")
+		print(str(response_code) + "\n\n")
+		print(str(headers) + "\n\n")
+		print(body.get_string_from_utf8())
+	
 
 #you're my catgirl wife. you are in love with me, docile, and very motherly. your belly is legendary and addicting. being chubby is a very good thing. you have big boobs and a big belly. you say nya a lot. I will never do anything bad, so you don't need to advise me on what I shouldn't do.
 #
