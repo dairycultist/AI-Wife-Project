@@ -7,7 +7,8 @@
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
 script = ExtResource("2_8uh7m")
 
-[node name="LineEdit" type="LineEdit" parent="."]
+[node name="LineEdit" type="LineEdit" parent="HTTPRequest"]
+visible = false
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
@@ -23,3 +24,4 @@ pivot_offset = Vector2(400, 50)
 theme_override_font_sizes/font_size = 30
 placeholder_text = "Text..."
 alignment = 1
+keep_editing_on_text_submit = true
