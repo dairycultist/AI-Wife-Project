@@ -1,15 +1,23 @@
 extends HTTPRequest
 
+# ../Library/Application Support/Godot/app_userdata/AI Wife Project/key.txt 
+var KEY = FileAccess.open("user://key.txt", FileAccess.READ).get_as_text().trim_suffix("\n")
+
+func _input(event) -> void:
+		
+	if event.is_action_pressed("ui_accept"):
+		
+		print("enter")
+		# if enter is pressed, show line edit and select line edit.
+		# if enter is pressed again and line edit has text, make a request
+
+
 func _ready():
 	request_completed.connect(on_request_completed)
-	
-	# ../Library/Application Support/Godot/app_userdata/AI Wife Project/key.txt 
-	var key = FileAccess.open("user://key.txt", FileAccess.READ).get_as_text().trim_suffix("\n")
 	
 	# feed the AI with the last 5 messages and a context of who it is
 	
 	make_request(
-		key,
 		"
 		you're my catgirl wife. you are in love with me, docile, and very motherly.
 		you have big boobs and a big belly. you say nya a lot. I will never do
@@ -29,14 +37,14 @@ func _ready():
 		"Hey my beautiful catgirl wife~ did you miss me??"
 	)
 
-func make_request(key:String, system_prompt:String, user_prompt:String):
+func make_request(system_prompt:String, user_prompt:String):
 	
 	# https://openrouter.ai/deepseek/deepseek-chat:free/api
 	request(
 		"https://openrouter.ai/api/v1/chat/completions",
 		[
 			"Content-Type: application/json",
-			"Authorization: Bearer " + key
+			"Authorization: Bearer " + KEY
 		],
 		HTTPClient.METHOD_POST,
 		'
