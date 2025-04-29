@@ -14,7 +14,10 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	
-	self.global_position = Vector3(sin(Time.get_ticks_msec() * PI / 1000) * 0.5, 0, cos(Time.get_ticks_msec() * PI / 1000) * 0.5)
+	self.global_position = Vector3(Time.get_ticks_msec() / 1000.0, 0, 0)
 	
-	leg1.basis = Basis.looking_at(leg1.global_position.direction_to(leg1_target))
-	leg2.basis = Basis.looking_at(leg2.global_position.direction_to(leg2_target))
+	if (leg1.global_position.distance_to(leg1_target) > 1.5):
+		leg1_target += Vector3(2, 0, 0)
+	
+	leg1.basis = lerp(leg1.basis, Basis.looking_at(leg1.global_position.direction_to(leg1_target), Vector3(0, 0, 1)), 5 * delta)
+	leg2.basis = lerp(leg2.basis, Basis.looking_at(leg2.global_position.direction_to(leg2_target)), 5 * delta)
