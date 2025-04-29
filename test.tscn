@@ -43,15 +43,22 @@ placeholder_text = "Text..."
 alignment = 1
 keep_editing_on_text_submit = true
 
-[node name="Wife" type="Node3D" parent="." node_paths=PackedStringArray("body", "leg1", "leg2")]
+[node name="Wife" type="Node3D" parent="." node_paths=PackedStringArray("leg1", "leg2", "leg1_probe", "leg2_probe")]
 script = ExtResource("2_ppyta")
-body = NodePath("Body")
 leg1 = NodePath("Leg1")
 leg2 = NodePath("Leg2")
+leg1_probe = NodePath("Leg1Probe")
+leg2_probe = NodePath("Leg2Probe")
 
 [node name="Body" type="MeshInstance3D" parent="Wife"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 mesh = SubResource("CylinderMesh_8uh7m")
+
+[node name="Leg1Probe" type="Node3D" parent="Wife"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1, 0.8)
+
+[node name="Leg2Probe" type="Node3D" parent="Wife"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 1, 0.8)
 
 [node name="Leg1" type="Node3D" parent="Wife"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1, 0)
