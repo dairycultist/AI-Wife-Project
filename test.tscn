@@ -1,8 +1,24 @@
-[gd_scene load_steps=2 format=3 uid="uid://cjthdu0aj3hek"]
+[gd_scene load_steps=8 format=3 uid="uid://cjthdu0aj3hek"]
 
+[ext_resource type="Script" uid="uid://cjj0prt24iqv8" path="res://player_controller.gd" id="2_6uqi0"]
 [ext_resource type="Script" uid="uid://bmkwl0exo8o5r" path="res://poll_ai.gd" id="2_8uh7m"]
 
-[node name="Node3D" type="Node3D"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_8uh7m"]
+height = 1.0
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_6uqi0"]
+radius = 0.1
+height = 1.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_37kl0"]
+size = Vector2(20, 20)
+orientation = 1
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_8uh7m"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ppyta"]
+
+[node name="Root" type="Node3D"]
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
 script = ExtResource("2_8uh7m")
@@ -25,3 +41,39 @@ theme_override_font_sizes/font_size = 30
 placeholder_text = "Text..."
 alignment = 1
 keep_editing_on_text_submit = true
+
+[node name="Wife" type="Node3D" parent="."]
+
+[node name="Body" type="MeshInstance3D" parent="Wife"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+mesh = SubResource("CylinderMesh_8uh7m")
+
+[node name="Leg1" type="MeshInstance3D" parent="Wife"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.3)
+mesh = SubResource("CapsuleMesh_6uqi0")
+
+[node name="Leg2" type="MeshInstance3D" parent="Wife"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.3)
+mesh = SubResource("CapsuleMesh_6uqi0")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("QuadMesh_37kl0")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("WorldBoundaryShape3D_8uh7m")
+
+[node name="Player" type="CharacterBody3D" parent="." node_paths=PackedStringArray("camera")]
+script = ExtResource("2_6uqi0")
+camera = NodePath("Camera3D")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_ppyta")
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 0, 0)
