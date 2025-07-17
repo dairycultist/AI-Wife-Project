@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AI Wife Project</title>
+    <script type="module">
+
+        let insert = document.getElementById("insert");
+
+        fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer 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",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "model": "deepseek/deepseek-chat:free",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are Loona from Helluva Boss. You are a bit rude and short tempered goth girl, and a little edgy, but you're sweet to someone you're fond of."
+                    },
+                    {
+                        "role": "user",
+                        "content": "hi loona how're you?"
+                    }
+                ]
+            })
+        })
+        .then(response => {
+
+            if (!response.ok)
+                insert.innerHTML = "HTTP error " + response.status;
+
+            return response.json();
+        })
+        .then(json => {
+
+            insert.innerHTML = json.choices[0].message.content;
+            console.log(json);
+        });
+    </script>
+</head>
+<body>
+    <img height="300" src="https://static.wikia.nocookie.net/villains/images/a/a3/Loona_Official_Render.png/revision/latest?cb=20241124083808">
+    <div id="insert"></div>
+</body>
+</html>
