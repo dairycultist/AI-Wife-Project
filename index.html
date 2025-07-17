@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>AI Wife Project</title>
+
+    <style>
+        body { font-family: sans-serif; }
+        input[type="text"] { resize: none; width: 30em; }
+        i { color: green; }
+    </style>
     
     <script type="module">
 
@@ -45,7 +51,7 @@
             })
             .then(json => {
 
-                insert.innerHTML = json.choices[0].message.content;
+                insert.innerHTML = json.choices[0].message.content.replaceAll(/\*([^\*]*)\*/g, "<i>$1</i>").replaceAll("\"", "");
                 console.log(json);
 
                 messagebox.disabled = false;
@@ -57,6 +63,6 @@
 <body>
     <img height="300" src="https://static.wikia.nocookie.net/villains/images/a/a3/Loona_Official_Render.png/revision/latest?cb=20241124083808">
     <div id="insert"></div>
-    <input type="text" id="messagebox" style="resize: none; width: 30em;"></input>
+    <input type="text" id="messagebox"></input>
 </body>
 </html>
