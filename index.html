@@ -5,9 +5,14 @@
     <title>AI Wife Project</title>
 
     <style>
-        body { font-family: sans-serif; }
-        input[type="text"] { resize: none; width: 30em; }
-        i { color: green; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+        body { font-family: "Inter", sans-serif; font-size: 12px; }
+        textarea { resize: none; width: 100%; height: 4em; vertical-align: top; font: inherit; padding: 0.6em; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+
+        p.user, p.assistant, p.error { padding: 0.6em 0.8em; border-radius: 8px; max-width: 80%; clear: both; }
+        p.user { background: rgb(232, 236, 251); float: right; }
+        p.assistant { background: #eeeff2; float: left; }
     </style>
     
     <script type="module">
@@ -27,12 +32,14 @@
             if (event.key != "Enter" || messagebox.value.trim().length == 0)
                 return;
 
+            messagebox.value = messagebox.value.replace(/\n/g, '');
+
             memory.push({
                 "role": "user",
                 "content": messagebox.value
             });
 
-            insert.innerHTML += `<p style="color: grey;">${messagebox.value}</p>`;
+            insert.innerHTML += `<p class="user">${messagebox.value}</p>`;
 
             messagebox.disabled = true;
             messagebox.value = "";
@@ -40,7 +47,7 @@
             fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
                 headers: {
-                    "Authorization": "Bearer _",
+                    "Authorization": "Bearer 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",
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
@@ -51,7 +58,7 @@
             .then(response => {
 
                 if (!response.ok)
-                    insert.innerHTML += `<p style="color: red;">HTTP error ${response.status}</p>`;
+                    insert.innerHTML += `<p class="error">HTTP error ${response.status}</p>`;
 
                 return response.json();
             })
@@ -59,7 +66,7 @@
 
                 // .replaceAll(/\*([^\*]*)\*/g, "<i>$1</i>")
 
-                insert.innerHTML += `<p>${ json.choices[0].message.content.toLowerCase().replaceAll("\"", "") }</p>`;
+                insert.innerHTML += `<p class="assistant">${ json.choices[0].message.content.toLowerCase().replaceAll("\"", "") }</p>`;
 
                 memory.push({
                     "role": "assistant",
@@ -74,8 +81,10 @@
     </script>
 </head>
 <body>
-    <img height="300" src="https://static.wikia.nocookie.net/villains/images/a/a3/Loona_Official_Render.png/revision/latest?cb=20241124083808">
-    <div id="insert"></div>
-    <input type="text" id="messagebox"></input>
+    <div style="width: 40em; margin: auto;">
+        <img height="300" src="https://static.wikia.nocookie.net/villains/images/a/a3/Loona_Official_Render.png/revision/latest?cb=20241124083808">
+        <div id="insert"></div>
+        <textarea id="messagebox" wrap="soft" placeholder="Type your message..."></textarea>
+    </div>
 </body>
 </html>
