@@ -7,17 +7,22 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
-        body { font-family: "Inter", sans-serif; font-size: 12px; }
-        textarea { resize: none; width: 100%; height: 4em; vertical-align: top; font: inherit; padding: 0.6em; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        body { font-family: "Inter", sans-serif; font-size: 14px; }
+        #messagebox { resize: none; width: 100%; height: 4em; vertical-align: top; font: inherit; padding: 0.6em; border: 1px solid #eee; border-radius: 6px; box-sizing: border-box; }
+        #sendbutton { cursor: pointer; width: 50px; border: 1px solid #4bd; background: #8ce; border-radius: 6px; }
+        #sendbutton:disabled { background: #ccc; border-color: #bbb; }
 
-        p.user, p.assistant, p.error { padding: 0.6em 0.8em; border-radius: 8px; max-width: 80%; clear: both; }
-        p.user { background: rgb(232, 236, 251); float: right; }
-        p.assistant { background: #eeeff2; float: left; }
+        p.user, p.assistant, p.error { padding: 0.7em 1.0em; border-radius: 8px; max-width: 80%; clear: both; }
+        p.user { background: rgb(232, 236, 251); float: right; color: #223; }
+        p.assistant { background: #eeeff2; float: left; color: #444; }
+
+        a { color: inherit; text-decoration: underline; text-decoration-style: dotted; }
     </style>
     
     <script type="module">
 
         const messagebox = document.getElementById("messagebox");
+        const sendbutton = document.getElementById("sendbutton");
         const insert = document.getElementById("insert");
 
         let memory = [
@@ -27,9 +32,9 @@
             }
         ];
 
-        messagebox.addEventListener("keydown", (event) => {
+        function send(event) {
 
-            if (event.key != "Enter" || messagebox.value.trim().length == 0)
+            if ((event instanceof KeyboardEvent && event.key != "Enter") || messagebox.value.trim().length == 0)
                 return;
 
             messagebox.value = messagebox.value.replace(/\n/g, '');
@@ -42,12 +47,13 @@
             insert.innerHTML += `<p class="user">${messagebox.value}</p>`;
 
             messagebox.disabled = true;
+            sendbutton.disabled = true;
             messagebox.value = "";
 
             fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
                 headers: {
-                    "Authorization": "Bearer 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",
+                    "Authorization": "Bearer _",
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
@@ -76,15 +82,25 @@
                 console.log(json);
 
                 messagebox.disabled = false;
+                sendbutton.disabled = false;
             });
-        });
+        }
+
+        messagebox.addEventListener("keydown", send);
+        sendbutton.addEventListener("click", send);
     </script>
 </head>
 <body>
+    <a href="https://openrouter.ai/">OpenRouter</a> key: 
     <div style="width: 40em; margin: auto;">
         <img height="300" src="https://static.wikia.nocookie.net/villains/images/a/a3/Loona_Official_Render.png/revision/latest?cb=20241124083808">
         <div id="insert"></div>
-        <textarea id="messagebox" wrap="soft" placeholder="Type your message..."></textarea>
+        <div style="display: flex; gap: 8px; clear: both;">
+            <textarea id="messagebox" wrap="soft" placeholder="Type your message..."></textarea>
+            <button type="button" id="sendbutton">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#fff"><path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/></svg>
+            </button>
+        </div>
     </div>
 </body>
 </html>
