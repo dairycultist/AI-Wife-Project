@@ -1,4 +1,6 @@
-// should probably allow for part translation (for lips, eyelids, etc moving up/down) and scaling (same stuff ig)
+// should probably allow for layer translation (for lips, eyelids, etc moving up/down) and scaling (same stuff ig)
+// also layers should be able to inherit the transformations of a parent layer, e.g. for twintails that swing alongside moving with the head
+// or idk
 
 static char *vertex =
 "#version 150 core\n"
@@ -48,7 +50,16 @@ typedef struct {
 } Layer; // a layer is a mesh + a texture + a layer depth (used for rotation; every vertex on the same layer has the same depth, no depth testing needed, just draw painterly)
 
 // returns NULL on error
-Layer *create_layer(const float depth, const unsigned char *mesh_data, const int mesh_bytecount, const int mesh_vertcount, const char *tex_path) {
+Layer *create_layer(const float depth, const float scale, const char *tex_path) {
+
+	float mesh_data[] = {
+		-scale, -scale, 0.0, 1.0,
+		 scale,  scale, 1.0, 0.0,
+		-scale,  scale, 0.0, 0.0,
+		-scale, -scale, 0.0, 1.0,
+		 scale,  scale, 1.0, 0.0,
+		 scale, -scale, 1.0, 1.0,
+	};
 
 	// make vertex array
 	GLuint vertex_array;
@@ -59,7 +70,7 @@ Layer *create_layer(const float depth, const unsigned char *mesh_data, const int
 	GLuint vertexBuffer;
 	glGenBuffers(1, &vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);								// make it the active buffer
-	glBufferData(GL_ARRAY_BUFFER, mesh_bytecount, mesh_data, GL_STATIC_DRAW);	// copy vertex data into the active buffer
+	glBufferData(GL_ARRAY_BUFFER, sizeof(mesh_data), mesh_data, GL_STATIC_DRAW);	// copy vertex data into the active buffer
 
 	// link active vertex data and shader attributes
 	GLint pos_attrib = glGetAttribLocation(shader_program, "position");
@@ -103,7 +114,7 @@ Layer *create_layer(const float depth, const unsigned char *mesh_data, const int
 	// create final layer object to return
 	Layer *layer = malloc(sizeof(Layer));
 	layer->vertex_array = vertex_array;
-	layer->vertex_count = mesh_vertcount;
+	layer->vertex_count = 6;
 	layer->texture = texture;
 	layer->depth = depth;
 

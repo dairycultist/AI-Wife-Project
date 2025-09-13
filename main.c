@@ -50,15 +50,8 @@ int main() {
 	update_screen_size(800, 400);
 	
 	// let programmer initialize stuff
-	float mesh_data[] = {
-		-.5, -.5, 0.0, 1.0,
-		0.5, 0.5, 1.0, 0.0,
-		-.5, 0.5, 0.0, 0.0,
-		-.5, -.5, 0.0, 1.0,
-		0.5, 0.5, 1.0, 0.0,
-		0.5, -.5, 1.0, 1.0,
-	};
-	Layer *layer = create_layer(0.0, (const unsigned char *) mesh_data, sizeof(mesh_data), 6, "image.png");
+	float scale = 0.5;
+	Layer *layer = create_layer(0.0, scale, "image.png");
 
 	// process events until window is closed
 	SDL_Event event;
