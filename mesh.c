@@ -1,7 +1,9 @@
 // all 3D objects use the same hardcoded shader for simplicity
 static char *vertex =
 "#version 150 core\n"
-// "uniform mat4 view_matrix;\n"
+// "uniform mat4 view_matrix;\n" // for correcting for screen stretch
+// "uniform mat4 move_matrix;\n" // for the various rotations/transformations associated with looking in different directions and stuff
+// "uniform float depth;\n" // each mesh is placed on a different "layer" which rotates based on their layer depth
 "in vec2 position;\n"
 "in vec2 UV;\n"
 "out vec2 frag_UV;\n"
@@ -20,7 +22,6 @@ static char *fragment =
 "}";
 
 static GLuint shader_program;
-static GLfloat proj_matrix[4][4] = {0};
 
 typedef struct {
 

@@ -51,9 +51,12 @@ int main() {
 	float mesh_data[] = {
 		0.0, 0.0, 0.0, 0.0,
 		1.0, 1.0, 1.0, 1.0,
-		0.0, 1.0, 0.0, 1.0
+		0.0, 1.0, 0.0, 1.0,
+		0.0, 0.0, 0.0, 0.0,
+		1.0, 1.0, 1.0, 1.0,
+		1.0, 0.0, 1.0, 0.0,
 	};
-	Mesh *mesh = create_mesh((const unsigned char *) mesh_data, sizeof(mesh_data), 3, dirt_texture_data, 16, 16);
+	Mesh *mesh = create_mesh((const unsigned char *) mesh_data, sizeof(mesh_data), 6, dirt_texture_data, 16, 16);
 
 	// process events until window is closed
 	SDL_Event event;
@@ -69,8 +72,6 @@ int main() {
 				glViewport(0, 0, event.window.data1, event.window.data2);
 			}
 		}
-
-		printf("a\n");
 
 		// draw stuff
 		draw_mesh(mesh);
