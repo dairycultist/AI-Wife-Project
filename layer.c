@@ -93,10 +93,8 @@ void draw_layer(const Layer *layer) {
 	glBindVertexArray(layer->vertex_array);
 	glBindTexture(GL_TEXTURE_2D, layer->texture);
 
-	// load the shader program and the uniforms we just calculated
-	glUseProgram(shader_program);
+	// load shader uniforms
 	glUniformMatrix4fv(glGetUniformLocation(shader_program, "view_matrix"), 1, GL_FALSE, &view_matrix[0][0]);
-
 	glUniform1f(glGetUniformLocation(shader_program, "depth"), layer->depth);
 
 	// draw
@@ -118,8 +116,11 @@ void initialize_shader() {
 	glCompileShader(fragment_shader);
 	glAttachShader(shader_program, fragment_shader);
 
-	// apply changes to shader program (not gonna call "glUseProgram" yet bc not drawing)
+	// apply changes to shader program
 	glLinkProgram(shader_program);
+
+	// load the shader program (can do this at initialization since we never need to swap shaders)
+	glUseProgram(shader_program);
 }
 
 void update_screen_size(int w, int h) {
