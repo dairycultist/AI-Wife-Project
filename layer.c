@@ -11,7 +11,10 @@ static char *vertex =
 "out vec2 frag_UV;\n"
 "void main() {\n"
 	"frag_UV = UV;\n"
-	// vtuber layers tend to pivot around a certain spot (e.g. head around neck), this matrix math combines the relevant rotations/transformations to do that
+
+	// origin: the position to center the layer at and rotate the layer around before pivot rotation (origin values are generally static, but may be dynamic for things like wobble)
+
+	// pivot: a point (potentially) outside the layer. after origin math, the layer is rotated around this pivot (pivot values are generally dynamic for things like head looking around while pivoting at the neck)
 	"float roll_sin = sin(pivot_rotation.x);\n"
 	"float roll_cos = cos(pivot_rotation.x);\n"
 	"mat3 roll = mat3(roll_cos, roll_sin, 0, -roll_sin, roll_cos, 0, 0, 0, 1.0);\n"
@@ -57,7 +60,6 @@ typedef struct {
 } Layer; // a layer is a mesh + a texture + a layer depth + some translation/rotation information (used for rotation; every vertex on the same layer has the same depth, no depth testing needed, just draw painterly)
 
 // TODO allow for layer translation (for lips, eyelids, etc moving up/down) and scaling (same stuff ig)
-// translation is applied before rotation (since rotation is around a pivot instead of your origin), unlike other systems
 
 // returns NULL on error
 Layer *create_layer(const float depth, const char *tex_path) {

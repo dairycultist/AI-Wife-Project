@@ -68,9 +68,9 @@ int main() {
 		layers[i]->pivot_y = -0.5;
 	}
 
-	layers[5]->origin_x = -0.11; // origin values are generally static (but may be dynamic for things like wobble), pivot values are generally dynamic
+	layers[5]->origin_x = -0.11;
 	layers[5]->origin_y = -0.04;
-	layers[5]->origin_yaw = 0.3;
+	layers[5]->origin_yaw = -0.3;
 
 	layers[6]->origin_x = 0.11;
 	layers[6]->origin_y = -0.04;
