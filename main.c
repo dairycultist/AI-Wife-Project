@@ -68,13 +68,15 @@ int main() {
 		layers[i]->pivot_y = -0.5;
 	}
 
-	layers[5]->x = -0.11;
-	layers[5]->y = -0.04;
+	layers[5]->origin_x = -0.11; // origin values are generally static (but may be dynamic for things like wobble), pivot values are generally dynamic
+	layers[5]->origin_y = -0.04;
+	layers[5]->origin_yaw = 0.3;
 
-	layers[6]->x = 0.11;
-	layers[6]->y = -0.04;
+	layers[6]->origin_x = 0.11;
+	layers[6]->origin_y = -0.04;
+	layers[6]->origin_yaw = 0.3;
 
-	layers[7]->y = -0.13;
+	layers[7]->origin_y = -0.13;
 
 	float t = 0.0;
 
@@ -97,16 +99,9 @@ int main() {
 		// draw layers
 		for (int i = 0; i < sizeof(layers) / sizeof(Layer *); i++) {
 
-			layers[i]->roll = sin(t * 1.2563) * 0.2;
-			layers[i]->yaw = sin(t * 5) * 0.65;
-
-			// eyes yaw inwards more
-			if (i == 5) {
-				layers[i]->yaw -= 0.3;
-			}
-			if (i == 6) {
-				layers[i]->yaw += 0.3;
-			}
+			layers[i]->pivot_roll = sin(t * 0.4) * 0.3;
+			layers[i]->pivot_pitch = sin(t) * 0.3;
+			layers[i]->pivot_yaw = sin(t * 1.23) * 0.6;
 
 			draw_layer(layers[i]);
 		}

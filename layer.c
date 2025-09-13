@@ -2,24 +2,29 @@ static char *vertex =
 "#version 150 core\n"
 "uniform float aspect_ratio;\n"
 "uniform vec2 origin;\n"
+"uniform vec3 origin_rotation;\n"
 "uniform vec2 pivot;\n"
-"uniform vec3 rotation;\n"
+"uniform vec3 pivot_rotation;\n"
 "uniform float depth;\n"
 "in vec2 position;\n"
 "in vec2 UV;\n"
 "out vec2 frag_UV;\n"
 "void main() {\n"
 	"frag_UV = UV;\n"
-	// vtuber parts tend to pivot around a certain spot (e.g. head around neck), this matrix math combines the relevant rotations/transformations to do that
-	"float roll_sin = sin(rotation.x);\n"
-	"float roll_cos = cos(rotation.x);\n"
+	// vtuber layers tend to pivot around a certain spot (e.g. head around neck), this matrix math combines the relevant rotations/transformations to do that
+	"float roll_sin = sin(pivot_rotation.x);\n"
+	"float roll_cos = cos(pivot_rotation.x);\n"
 	"mat3 roll = mat3(roll_cos, roll_sin, 0, -roll_sin, roll_cos, 0, 0, 0, 1.0);\n"
 
-	"float yaw_sin = sin(rotation.y);\n"
-	"float yaw_cos = cos(rotation.y);\n"
+	"float yaw_sin = sin(pivot_rotation.y);\n"
+	"float yaw_cos = cos(pivot_rotation.y);\n"
 	"mat3 yaw = mat3(yaw_cos, 0, -yaw_sin, 0, 1.0, 0, yaw_sin, 0, yaw_cos);\n"
 
-	"vec3 rotated = (roll * yaw * vec3(position + origin - pivot, depth)) + vec3(pivot, 0);\n"
+	"float pitch_sin = sin(pivot_rotation.z);\n"
+	"float pitch_cos = cos(pivot_rotation.z);\n"
+	"mat3 pitch = mat3(1.0, 0, 0, 0, pitch_cos, pitch_sin, 0, -pitch_sin, pitch_cos);\n"
+
+	"vec3 rotated = (roll * yaw * pitch * vec3(position + origin - pivot, depth)) + vec3(pivot, 0);\n"
 
     "gl_Position = vec4(rotated.xy, -1.0, 1.0) * vec4(aspect_ratio, 1.0, 1.0, 1.0);\n"
 "}";
@@ -44,9 +49,10 @@ typedef struct {
 	GLuint texture;
 	float depth;
 
-	float x, y;
+	float origin_x, origin_y;
+	float origin_roll, origin_yaw, origin_pitch;
 	float pivot_x, pivot_y;
-	float roll, yaw, pitch;
+	float pivot_roll, pivot_yaw, pivot_pitch;
 
 } Layer; // a layer is a mesh + a texture + a layer depth + some translation/rotation information (used for rotation; every vertex on the same layer has the same depth, no depth testing needed, just draw painterly)
 
@@ -123,13 +129,18 @@ Layer *create_layer(const float depth, const char *tex_path) {
 	layer->vertex_array = vertex_array;
 	layer->texture = texture;
 	layer->depth = depth;
-	layer->x = 0.0;
-	layer->y = 0.0;
+
+	layer->origin_x = 0.0;
+	layer->origin_y = 0.0;
+	layer->origin_roll = 0.0;
+	layer->origin_yaw = 0.0;
+	layer->origin_pitch = 0.0;
+
 	layer->pivot_x = 0.0;
 	layer->pivot_y = 0.0;
-	layer->roll = 0.0;
-	layer->yaw = 0.0;
-	layer->pitch = 0.0;
+	layer->pivot_roll = 0.0;
+	layer->pivot_yaw = 0.0;
+	layer->pivot_pitch = 0.0;
 
 	// free the SDL surface
 	SDL_FreeSurface(surface);
@@ -145,9 +156,10 @@ void draw_layer(const Layer *layer) {
 
 	// load shader uniforms
 	glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
-	glUniform2f(glGetUniformLocation(shader_program, "origin"), layer->x, layer->y);
-	glUniform3f(glGetUniformLocation(shader_program, "rotation"), layer->roll, layer->yaw, layer->pitch);
+	glUniform2f(glGetUniformLocation(shader_program, "origin"), layer->origin_x, layer->origin_y);
+	glUniform3f(glGetUniformLocation(shader_program, "origin_rotation"), layer->origin_roll, layer->origin_yaw, layer->origin_pitch);
 	glUniform2f(glGetUniformLocation(shader_program, "pivot"), layer->pivot_x, layer->pivot_y);
+	glUniform3f(glGetUniformLocation(shader_program, "pivot_rotation"), layer->pivot_roll, layer->pivot_yaw, layer->pivot_pitch);
 	glUniform1f(glGetUniformLocation(shader_program, "depth"), layer->depth);
 
 	// draw
