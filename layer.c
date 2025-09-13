@@ -1,4 +1,3 @@
-// all 3D objects use the same hardcoded shader for simplicity
 static char *vertex =
 "#version 150 core\n"
 "uniform mat4 view_matrix;\n" // for correcting for screen stretch
@@ -30,12 +29,12 @@ typedef struct {
 	GLuint vertex_array; // "VAO"
 	uint vertex_count;
 	GLuint texture;
-	// float depth;
+	float depth;
 
 } Layer; // a layer is a mesh + a texture + a layer depth (used for rotation; every vertex on the same layer has the same depth, no depth testing needed, just draw painterly)
 
 // returns NULL on error
-Layer *create_layer(const unsigned char *layer_data, const int layer_bytecount, const int layer_vertcount, const unsigned char *tex_data, const int tex_width, const int tex_height) {
+Layer *create_layer(const float depth, const unsigned char *mesh_data, const int mesh_bytecount, const int mesh_vertcount, const unsigned char *tex_data, const int tex_width, const int tex_height) {
 
 	// make vertex array
 	GLuint vertex_array;
@@ -46,7 +45,7 @@ Layer *create_layer(const unsigned char *layer_data, const int layer_bytecount, 
 	GLuint vertexBuffer;
 	glGenBuffers(1, &vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);								// make it the active buffer
-	glBufferData(GL_ARRAY_BUFFER, layer_bytecount, layer_data, GL_STATIC_DRAW);	// copy vertex data into the active buffer
+	glBufferData(GL_ARRAY_BUFFER, mesh_bytecount, mesh_data, GL_STATIC_DRAW);	// copy vertex data into the active buffer
 
 	// link active vertex data and shader attributes
 	GLint pos_attrib = glGetAttribLocation(shader_program, "position");
@@ -81,8 +80,9 @@ Layer *create_layer(const unsigned char *layer_data, const int layer_bytecount, 
 	// create final layer object to return
 	Layer *layer = malloc(sizeof(Layer));
 	layer->vertex_array = vertex_array;
-	layer->vertex_count = layer_vertcount;
+	layer->vertex_count = mesh_vertcount;
 	layer->texture = texture;
+	layer->depth = depth;
 
 	return layer;
 }

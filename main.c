@@ -57,7 +57,7 @@ int main() {
 		1.0, 1.0, 1.0, 1.0,
 		1.0, 0.0, 1.0, 0.0,
 	};
-	Layer *layer = create_layer((const unsigned char *) layer_data, sizeof(layer_data), 6, dirt_texture_data, 16, 16);
+	Layer *layer = create_layer(1.0, (const unsigned char *) layer_data, sizeof(layer_data), 6, dirt_texture_data, 16, 16);
 
 	// process events until window is closed
 	SDL_Event event;
