@@ -99,14 +99,17 @@ int main() {
 		// draw layers
 		for (int i = 0; i < sizeof(layers) / sizeof(Layer *); i++) {
 
-			// layers[i]->pivot_roll = sin(t * 0.4) * 0.3;
-			layers[i]->pivot_pitch = sin(t * 3) * 0.4;
-			// layers[i]->pivot_yaw = sin(t * 1.23) * 0.6;
+			layers[i]->pivot_pitch = cos((t - 0.35) * 6) * 0.1;
+			layers[i]->pivot_yaw = sin(t * 3) * 0.65;
+
+			if (i <= 2 || i == 8 || i == 10) {
+				layers[i]->origin_roll = -sin((t + 0.5) * 3) * 0.2;
+			}
 
 			draw_layer(layers[i]);
 		}
 
-		t += 0.01;
+		t += 0.02;
 
 		// swap buffers
 		SDL_GL_SwapWindow(window);
