@@ -59,7 +59,8 @@ int main() {
 		create_layer(0.22, "tex_eyeleft.png"),
 		create_layer(0.22, "tex_eyeright.png"),
 		create_layer(0.25, "tex_nose.png"),
-		create_layer(0.21, "tex_frills.png"),
+		create_layer(0.21, "tex_frill_left.png"),
+		create_layer(0.21, "tex_frill_right.png"),
 		create_layer(0.21, "tex_baseofbangs.png"),
 		create_layer(0.27, "tex_bangs.png"),
 	};
@@ -68,7 +69,7 @@ int main() {
 		layers[i]->pivot_y = -0.3;
 	}
 
-	layers[5]->origin_x = -0.08;
+	layers[5]->origin_x = -0.08; // eyes
 	layers[5]->origin_y = -0.04;
 	layers[5]->origin_yaw = -0.3;
 
@@ -76,7 +77,13 @@ int main() {
 	layers[6]->origin_y = -0.04;
 	layers[6]->origin_yaw = 0.3;
 
-	layers[7]->origin_y = -0.13;
+	layers[7]->origin_y = -0.13; // nose
+
+	layers[8]->origin_x = -0.25; // frills
+	layers[8]->origin_yaw = -0.2;
+
+	layers[9]->origin_x = 0.25;
+	layers[9]->origin_yaw = 0.2;
 
 	int screen_w = 800, screen_h = 400;
 	float mouse_u = 0.0, mouse_v = 0.0;
@@ -119,7 +126,7 @@ int main() {
 			layers[i]->pivot_pitch = mouse_v * 0.6;
 			layers[i]->pivot_yaw = mouse_u * 0.6;
 
-			if (i == 2 || i == 8 || i == 10) {
+			if (i == 8 || i == 9 || i == 11) {
 				layers[i]->origin_roll = wobble_pos;
 			}
 
