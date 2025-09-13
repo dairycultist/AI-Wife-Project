@@ -109,11 +109,11 @@ void draw_layer(const Layer *layer) {
 
 	// load shader uniforms
 	glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
-	glUniform3f(glGetUniformLocation(shader_program, "rotation"), 0.0, t, 0.0);
-	glUniform2f(glGetUniformLocation(shader_program, "pivot"), 0.0, 0.0);
+	glUniform3f(glGetUniformLocation(shader_program, "rotation"), sin(t * 1.2563), sin(t), 0.0);
+	glUniform2f(glGetUniformLocation(shader_program, "pivot"), 0.0, -0.5);
 	glUniform1f(glGetUniformLocation(shader_program, "depth"), layer->depth);
 
-	t += 0.01;
+	t += 0.02;
 
 	// draw
 	glDrawArrays(GL_TRIANGLES, 0, layer->vertex_count);
