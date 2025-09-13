@@ -1,3 +1,5 @@
+// should probably allow for part translation (for lips, eyelids, etc moving up/down) and scaling (same stuff ig)
+
 static char *vertex =
 "#version 150 core\n"
 "uniform float aspect_ratio;\n"
@@ -87,7 +89,7 @@ Layer *create_layer(const float depth, const unsigned char *mesh_data, const int
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// write texture data
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex_width, tex_height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_width, tex_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
 
 	// create final layer object to return
 	Layer *layer = malloc(sizeof(Layer));
