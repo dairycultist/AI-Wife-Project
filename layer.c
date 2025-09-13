@@ -1,6 +1,6 @@
 static char *vertex =
 "#version 150 core\n"
-"uniform mat4 view_matrix;\n"
+"uniform float aspect_ratio;\n"
 "uniform vec3 rotation;\n"
 // "uniform vec3 pivot;\n"
 "uniform float depth;\n"
@@ -9,10 +9,10 @@ static char *vertex =
 "out vec2 frag_UV;\n"
 "void main() {\n"
 	// vtuber parts tend to pivot around a certain spot (e.g. head around neck), this matrix math combines the relevant rotations/transformations to do that
-	"float yaw_sin = sin(rotation.x);\n"
-	"float yaw_cos = cos(rotation.x);\n"
-	"mat3 yaw = mat3(yaw_cos, yaw_sin, 0, -yaw_sin, yaw_cos, 0, 0, 0, 1.0);\n"
-    "gl_Position = view_matrix * vec4(yaw * vec3(position.xy, depth), 1.0);\n"
+	"float roll_sin = sin(rotation.x);\n"
+	"float roll_cos = cos(rotation.x);\n"
+	"mat3 roll = mat3(roll_cos, roll_sin, 0, -roll_sin, roll_cos, 0, 0, 0, 1.0);\n"
+    "gl_Position = vec4(roll * vec3(position.xy, depth), 1.0) * vec4(aspect_ratio, 1.0, 1.0, 1.0);\n"
     "frag_UV = UV;\n"
 "}";
 
@@ -27,7 +27,7 @@ static char *fragment =
 
 static GLuint shader_program;
 
-static GLfloat view_matrix[4][4]; // for correcting for screen stretch
+static float aspect_ratio; // for correcting for screen stretch
 
 typedef struct {
 
@@ -99,7 +99,7 @@ void draw_layer(const Layer *layer) {
 	glBindTexture(GL_TEXTURE_2D, layer->texture);
 
 	// load shader uniforms
-	glUniformMatrix4fv(glGetUniformLocation(shader_program, "view_matrix"), 1, GL_FALSE, &view_matrix[0][0]);
+	glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
 	glUniform3f(glGetUniformLocation(shader_program, "rotation"), 0.5, 0.0, 0.0);
 	glUniform1f(glGetUniformLocation(shader_program, "depth"), layer->depth);
 
@@ -131,8 +131,5 @@ void initialize_shader() {
 
 void update_screen_size(int w, int h) {
 
-	view_matrix[0][0] = h / (float) w;
-	view_matrix[1][1] = 1;
-	view_matrix[2][2] = 1;
-	view_matrix[3][3] = 1;
+	aspect_ratio = h / (float) w;
 }
