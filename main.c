@@ -51,6 +51,7 @@ int main() {
 	
 	// let programmer initialize stuff
 	Layer *layers[] = {
+		create_layer(-0.32, "tex_backerhair.png"),
 		create_layer(-0.15, "tex_backhair.png"),
 		create_layer(-0.05, "tex_sidefrills.png"),
 		create_layer(-0.03, "tex_ears.png"),
@@ -58,8 +59,9 @@ int main() {
 		create_layer(0.07, "tex_eyeleft.png"),
 		create_layer(0.07, "tex_eyeright.png"),
 		create_layer(0.1, "tex_nose.png"),
-		create_layer(0.07, "tex_frills.png"),
-		create_layer(0.09, "tex_bangs.png"),
+		create_layer(0.06, "tex_frills.png"),
+		create_layer(0.06, "tex_baseofbangs.png"),
+		create_layer(0.12, "tex_bangs.png"),
 	};
 
 	float t = 0.0;
@@ -83,14 +85,16 @@ int main() {
 		// draw layers
 		for (int i = 0; i < sizeof(layers) / sizeof(Layer *); i++) {
 			layers[i]->roll = sin(t * 1.2563) * 0.1;
-			layers[i]->yaw = sin(t) * 0.7;
+			layers[i]->yaw = sin(t * 5) * 0.65;
 
-			if (i == 4) {
-				layers[i]->yaw -= 0.2;
-			}
+			// eyes yaw inwards more
 			if (i == 5) {
-				layers[i]->yaw += 0.2;
+				layers[i]->yaw -= 0.3;
 			}
+			if (i == 6) {
+				layers[i]->yaw += 0.3;
+			}
+
 			draw_layer(layers[i]);
 		}
 
