@@ -10,25 +10,45 @@ static char *vertex =
 "in vec2 UV;\n"
 "out vec2 frag_UV;\n"
 "void main() {\n"
+
 	"frag_UV = UV;\n"
 
-	// origin: the position to center the layer at and rotate the layer around before pivot rotation (origin values are generally static, but may be dynamic for things like wobble)
+	"vec3 rotated = vec3(position, depth);\n"
+	"mat3 roll; float roll_sin, roll_cos;\n"
+	"mat3 yaw; float yaw_sin, yaw_cos;\n"
+	"mat3 pitch; float pitch_sin, pitch_cos;\n"
+
+	// origin: the position to center the layer at and rotate the layer around before pivot rotation (origin values are generally static, but may be dynamic for things like hair wobble)
+	"roll_sin = sin(origin_rotation.x);\n"
+	"roll_cos = cos(origin_rotation.x);\n"
+	"roll = mat3(roll_cos, roll_sin, 0, -roll_sin, roll_cos, 0, 0, 0, 1.0);\n"
+
+	"yaw_sin = sin(origin_rotation.y);\n"
+	"yaw_cos = cos(origin_rotation.y);\n"
+	"yaw = mat3(yaw_cos, 0, -yaw_sin, 0, 1.0, 0, yaw_sin, 0, yaw_cos);\n"
+
+	"pitch_sin = sin(origin_rotation.z);\n"
+	"pitch_cos = cos(origin_rotation.z);\n"
+	"pitch = mat3(1.0, 0, 0, 0, pitch_cos, pitch_sin, 0, -pitch_sin, pitch_cos);\n"
+
+	"rotated = (roll * yaw * pitch * rotated) + vec3(origin, 0);\n"
 
 	// pivot: a point (potentially) outside the layer. after origin math, the layer is rotated around this pivot (pivot values are generally dynamic for things like head looking around while pivoting at the neck)
-	"float roll_sin = sin(pivot_rotation.x);\n"
-	"float roll_cos = cos(pivot_rotation.x);\n"
-	"mat3 roll = mat3(roll_cos, roll_sin, 0, -roll_sin, roll_cos, 0, 0, 0, 1.0);\n"
+	"roll_sin = sin(pivot_rotation.x);\n"
+	"roll_cos = cos(pivot_rotation.x);\n"
+	"roll = mat3(roll_cos, roll_sin, 0, -roll_sin, roll_cos, 0, 0, 0, 1.0);\n"
 
-	"float yaw_sin = sin(pivot_rotation.y);\n"
-	"float yaw_cos = cos(pivot_rotation.y);\n"
-	"mat3 yaw = mat3(yaw_cos, 0, -yaw_sin, 0, 1.0, 0, yaw_sin, 0, yaw_cos);\n"
+	"yaw_sin = sin(pivot_rotation.y);\n"
+	"yaw_cos = cos(pivot_rotation.y);\n"
+	"yaw = mat3(yaw_cos, 0, -yaw_sin, 0, 1.0, 0, yaw_sin, 0, yaw_cos);\n"
 
-	"float pitch_sin = sin(pivot_rotation.z);\n"
-	"float pitch_cos = cos(pivot_rotation.z);\n"
-	"mat3 pitch = mat3(1.0, 0, 0, 0, pitch_cos, pitch_sin, 0, -pitch_sin, pitch_cos);\n"
+	"pitch_sin = sin(pivot_rotation.z);\n"
+	"pitch_cos = cos(pivot_rotation.z);\n"
+	"pitch = mat3(1.0, 0, 0, 0, pitch_cos, pitch_sin, 0, -pitch_sin, pitch_cos);\n"
 
-	"vec3 rotated = (roll * yaw * pitch * vec3(position + origin - pivot, depth)) + vec3(pivot, 0);\n"
+	"rotated = (roll * yaw * pitch * (rotated - vec3(pivot, 0))) + vec3(pivot, 0);\n"
 
+	// final position on screen
     "gl_Position = vec4(rotated.xy, -1.0, 1.0) * vec4(aspect_ratio, 1.0, 1.0, 1.0);\n"
 "}";
 
