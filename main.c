@@ -51,14 +51,18 @@ int main() {
 	
 	// let programmer initialize stuff
 	Layer *layers[] = {
-		create_layer(-0.05, "tex_backhair.png"),
-		create_layer(-0.02, "tex_ears.png"),
+		create_layer(-0.15, "tex_backhair.png"),
+		create_layer(-0.05, "tex_sidefrills.png"),
+		create_layer(-0.03, "tex_ears.png"),
 		create_layer(0.0, "tex_face.png"),
-		create_layer(0.02, "tex_eyes.png"),
-		create_layer(0.04, "tex_nose.png"),
-		create_layer(0.02, "tex_frills.png"),
-		create_layer(0.05, "tex_bangs.png"),
+		create_layer(0.07, "tex_eyeleft.png"),
+		create_layer(0.07, "tex_eyeright.png"),
+		create_layer(0.1, "tex_nose.png"),
+		create_layer(0.07, "tex_frills.png"),
+		create_layer(0.09, "tex_bangs.png"),
 	};
+
+	float t = 0.0;
 
 	// process events until window is closed
 	SDL_Event event;
@@ -78,8 +82,19 @@ int main() {
 
 		// draw layers
 		for (int i = 0; i < sizeof(layers) / sizeof(Layer *); i++) {
+			layers[i]->roll = sin(t * 1.2563) * 0.1;
+			layers[i]->yaw = sin(t) * 0.7;
+
+			if (i == 4) {
+				layers[i]->yaw -= 0.2;
+			}
+			if (i == 5) {
+				layers[i]->yaw += 0.2;
+			}
 			draw_layer(layers[i]);
 		}
+
+		t += 0.01;
 
 		// swap buffers
 		SDL_GL_SwapWindow(window);

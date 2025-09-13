@@ -1,7 +1,3 @@
-// should probably allow for layer translation (for lips, eyelids, etc moving up/down) and scaling (same stuff ig)
-// also layers should be able to inherit the transformations of a parent layer, e.g. for twintails that swing alongside moving with the head
-// or idk
-
 static char *vertex =
 "#version 150 core\n"
 "uniform float aspect_ratio;\n"
@@ -47,7 +43,14 @@ typedef struct {
 	GLuint texture;
 	float depth;
 
-} Layer; // a layer is a mesh + a texture + a layer depth (used for rotation; every vertex on the same layer has the same depth, no depth testing needed, just draw painterly)
+	float layer_x, layer_y;
+	float pivot_x, pivot_y;
+	float roll, yaw, pitch;
+
+} Layer; // a layer is a mesh + a texture + a layer depth + some translation/rotation information (used for rotation; every vertex on the same layer has the same depth, no depth testing needed, just draw painterly)
+
+// TODO allow for layer translation (for lips, eyelids, etc moving up/down) and scaling (same stuff ig)
+// translation is applied before rotation (since rotation is around a pivot instead of your origin), unlike other systems
 
 // returns NULL on error
 Layer *create_layer(const float depth, const char *tex_path) {
@@ -61,8 +64,8 @@ Layer *create_layer(const float depth, const char *tex_path) {
 	}
 
 	// create a mesh that fits the size of the image
-	float mesh_w = surface->w / (float) 1600;
-	float mesh_h = surface->h / (float) 1600;
+	float mesh_w = surface->w / (float) 1000;
+	float mesh_h = surface->h / (float) 1000;
 
 	float mesh_data[] = {
 		-mesh_w, -mesh_h, 0.0, 1.0,
@@ -119,14 +122,19 @@ Layer *create_layer(const float depth, const char *tex_path) {
 	layer->vertex_array = vertex_array;
 	layer->texture = texture;
 	layer->depth = depth;
+	layer->layer_x = 0.0;
+	layer->layer_y = 0.0;
+	layer->pivot_x = 0.0;
+	layer->pivot_y = 0.0;
+	layer->roll = 0.0;
+	layer->yaw = 0.0;
+	layer->pitch = 0.0;
 
 	// free the SDL surface
 	SDL_FreeSurface(surface);
 
 	return layer;
 }
-
-float t = 0.0;
 
 void draw_layer(const Layer *layer) {
 
@@ -136,11 +144,9 @@ void draw_layer(const Layer *layer) {
 
 	// load shader uniforms
 	glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
-	glUniform3f(glGetUniformLocation(shader_program, "rotation"), sin(t * 1.2563) * 0.1, sin(t), 0.0);
-	glUniform2f(glGetUniformLocation(shader_program, "pivot"), 0.0, -0.5);
+	glUniform3f(glGetUniformLocation(shader_program, "rotation"), layer->roll, layer->yaw, layer->pitch);
+	glUniform2f(glGetUniformLocation(shader_program, "pivot"), layer->pivot_x, layer->pivot_y);
 	glUniform1f(glGetUniformLocation(shader_program, "depth"), layer->depth);
-
-	t += 0.01;
 
 	// draw
 	glDrawArrays(GL_TRIANGLES, 0, 6);
