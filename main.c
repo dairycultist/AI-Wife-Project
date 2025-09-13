@@ -99,11 +99,11 @@ int main() {
 		// draw layers
 		for (int i = 0; i < sizeof(layers) / sizeof(Layer *); i++) {
 
-			layers[i]->pivot_pitch = cos((t - 0.35) * 6) * 0.1;
+			layers[i]->pivot_pitch = cos((t - 0.35) * 6) * 0.03;
 			layers[i]->pivot_yaw = sin(t * 3) * 0.65;
 
 			if (i <= 2 || i == 8 || i == 10) {
-				layers[i]->origin_roll = -sin((t + 0.5) * 3) * 0.2;
+				layers[i]->origin_roll = -cos((t - 0.1) * 3) * 0.13;
 			}
 
 			draw_layer(layers[i]);
