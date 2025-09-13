@@ -3,7 +3,7 @@ static char *vertex =
 "#version 150 core\n"
 "uniform mat4 view_matrix;\n" // for correcting for screen stretch
 // "uniform mat4 move_matrix;\n" // for the various rotations/transformations associated with looking in different directions and stuff
-// "uniform float depth;\n" // each mesh is placed on a different "layer" which rotates based on their layer depth
+// "uniform float depth;\n"
 "in vec2 position;\n"
 "in vec2 UV;\n"
 "out vec2 frag_UV;\n"
@@ -30,11 +30,12 @@ typedef struct {
 	GLuint vertex_array; // "VAO"
 	uint vertex_count;
 	GLuint texture;
+	// float depth;
 
-} Mesh;
+} Layer; // a layer is a mesh + a texture + a layer depth (used for rotation; every vertex on the same layer has the same depth, no depth testing needed, just draw painterly)
 
 // returns NULL on error
-Mesh *create_mesh(const unsigned char *mesh_data, const int mesh_bytecount, const int mesh_vertcount, const unsigned char *tex, const int tex_width, const int tex_height) {
+Layer *create_layer(const unsigned char *layer_data, const int layer_bytecount, const int layer_vertcount, const unsigned char *tex_data, const int tex_width, const int tex_height) {
 
 	// make vertex array
 	GLuint vertex_array;
@@ -45,7 +46,7 @@ Mesh *create_mesh(const unsigned char *mesh_data, const int mesh_bytecount, cons
 	GLuint vertexBuffer;
 	glGenBuffers(1, &vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);								// make it the active buffer
-	glBufferData(GL_ARRAY_BUFFER, mesh_bytecount, mesh_data, GL_STATIC_DRAW);	// copy vertex data into the active buffer
+	glBufferData(GL_ARRAY_BUFFER, layer_bytecount, layer_data, GL_STATIC_DRAW);	// copy vertex data into the active buffer
 
 	// link active vertex data and shader attributes
 	GLint pos_attrib = glGetAttribLocation(shader_program, "position");
@@ -75,29 +76,29 @@ Mesh *create_mesh(const unsigned char *mesh_data, const int mesh_bytecount, cons
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// write texture data
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex_width, tex_height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex_width, tex_height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
 
-	// create final mesh object to return
-	Mesh *mesh = malloc(sizeof(Mesh));
-	mesh->vertex_array = vertex_array;
-	mesh->vertex_count = mesh_vertcount;
-	mesh->texture = texture;
+	// create final layer object to return
+	Layer *layer = malloc(sizeof(Layer));
+	layer->vertex_array = vertex_array;
+	layer->vertex_count = layer_vertcount;
+	layer->texture = texture;
 
-	return mesh;
+	return layer;
 }
 
-void draw_mesh(const Mesh *mesh) {
+void draw_layer(const Layer *layer) {
 
-	// bind the mesh's vertex mesh and texture
-	glBindVertexArray(mesh->vertex_array);
-	glBindTexture(GL_TEXTURE_2D, mesh->texture);
+	// bind the layer's vertex mesh and texture
+	glBindVertexArray(layer->vertex_array);
+	glBindTexture(GL_TEXTURE_2D, layer->texture);
 
 	// load the shader program and the uniforms we just calculated
 	glUseProgram(shader_program);
 	glUniformMatrix4fv(glGetUniformLocation(shader_program, "view_matrix"), 1, GL_FALSE, &view_matrix[0][0]);
 
 	// draw
-	glDrawArrays(GL_TRIANGLES, 0, mesh->vertex_count);
+	glDrawArrays(GL_TRIANGLES, 0, layer->vertex_count);
 }
 
 void initialize_shader() {
