@@ -50,8 +50,7 @@ int main() {
 	update_screen_size(800, 400);
 	
 	// let programmer initialize stuff
-	float scale = 0.5;
-	Layer *layer = create_layer(0.0, scale, "image.png");
+	Layer *layer = create_layer(0.0, "image.png");
 
 	// process events until window is closed
 	SDL_Event event;

@@ -50,15 +50,27 @@ typedef struct {
 } Layer; // a layer is a mesh + a texture + a layer depth (used for rotation; every vertex on the same layer has the same depth, no depth testing needed, just draw painterly)
 
 // returns NULL on error
-Layer *create_layer(const float depth, const float scale, const char *tex_path) {
+Layer *create_layer(const float depth, const char *tex_path) {
+
+	// read image with SDL
+	SDL_Surface *surface = IMG_Load(tex_path);
+
+	if (surface->format->BytesPerPixel != 4) {
+		log_error("IMG_Load loaded with the wrong SDL_PixelFormat and now you have to program conversion :(");
+		exit(1);
+	}
+
+	// create a mesh that fits the size of the image
+	float mesh_w = surface->w / (float) 1600;
+	float mesh_h = surface->h / (float) 1600;
 
 	float mesh_data[] = {
-		-scale, -scale, 0.0, 1.0,
-		 scale,  scale, 1.0, 0.0,
-		-scale,  scale, 0.0, 0.0,
-		-scale, -scale, 0.0, 1.0,
-		 scale,  scale, 1.0, 0.0,
-		 scale, -scale, 1.0, 1.0,
+		-mesh_w, -mesh_h, 0.0, 1.0,
+		 mesh_w,  mesh_h, 1.0, 0.0,
+		-mesh_w,  mesh_h, 0.0, 0.0,
+		-mesh_w, -mesh_h, 0.0, 1.0,
+		 mesh_w,  mesh_h, 1.0, 0.0,
+		 mesh_w, -mesh_h, 1.0, 1.0,
 	};
 
 	// make vertex array
@@ -69,7 +81,7 @@ Layer *create_layer(const float depth, const float scale, const char *tex_path) 
 	// make vertex buffer (stored by vertex_array)
 	GLuint vertexBuffer;
 	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);								// make it the active buffer
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);									// make it the active buffer
 	glBufferData(GL_ARRAY_BUFFER, sizeof(mesh_data), mesh_data, GL_STATIC_DRAW);	// copy vertex data into the active buffer
 
 	// link active vertex data and shader attributes
@@ -99,17 +111,8 @@ Layer *create_layer(const float depth, const float scale, const char *tex_path) 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	// read image with SDL then write to the OpenGL texture
-	SDL_Surface *surface = IMG_Load(tex_path);
-
-	if (surface->format->BytesPerPixel != 4) {
-		log_error("IMG_Load loaded with the wrong SDL_PixelFormat and now you have to program conversion :(");
-		exit(1);
-	}
-
+	// write to the OpenGL texture
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-
-	SDL_FreeSurface(surface);
 
 	// create final layer object to return
 	Layer *layer = malloc(sizeof(Layer));
@@ -117,6 +120,9 @@ Layer *create_layer(const float depth, const float scale, const char *tex_path) 
 	layer->vertex_count = 6;
 	layer->texture = texture;
 	layer->depth = depth;
+
+	// free the SDL surface
+	SDL_FreeSurface(surface);
 
 	return layer;
 }
