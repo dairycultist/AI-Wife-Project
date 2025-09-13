@@ -51,34 +51,37 @@ int main() {
 	
 	// let programmer initialize stuff
 	Layer *layers[] = {
-		create_layer(-0.27, "tex_backerhair.png"),
-		create_layer(-0.10, "tex_backhair.png"),
-		create_layer(0.0, "tex_sidefrills.png"),
-		create_layer(0.02, "tex_ears.png"),
-		create_layer(0.05, "tex_face.png"),
-		create_layer(0.12, "tex_eyeleft.png"),
-		create_layer(0.12, "tex_eyeright.png"),
-		create_layer(0.15, "tex_nose.png"),
-		create_layer(0.11, "tex_frills.png"),
-		create_layer(0.11, "tex_baseofbangs.png"),
-		create_layer(0.17, "tex_bangs.png"),
+		create_layer(-0.17, "tex_backerhair.png"),
+		create_layer(0.0, "tex_backhair.png"),
+		create_layer(0.1, "tex_sidefrills.png"),
+		create_layer(0.12, "tex_ears.png"),
+		create_layer(0.15, "tex_face.png"),
+		create_layer(0.22, "tex_eyeleft.png"),
+		create_layer(0.22, "tex_eyeright.png"),
+		create_layer(0.25, "tex_nose.png"),
+		create_layer(0.21, "tex_frills.png"),
+		create_layer(0.21, "tex_baseofbangs.png"),
+		create_layer(0.27, "tex_bangs.png"),
 	};
 
 	for (int i = 0; i < sizeof(layers) / sizeof(Layer *); i++) {
 		layers[i]->pivot_y = -0.3;
 	}
 
-	layers[5]->origin_x = -0.11;
+	layers[5]->origin_x = -0.08;
 	layers[5]->origin_y = -0.04;
 	layers[5]->origin_yaw = -0.3;
 
-	layers[6]->origin_x = 0.11;
+	layers[6]->origin_x = 0.08;
 	layers[6]->origin_y = -0.04;
 	layers[6]->origin_yaw = 0.3;
 
 	layers[7]->origin_y = -0.13;
 
-	float t = 0.0;
+	int screen_w = 800, screen_h = 400;
+	float mouse_u = 0.0, mouse_v = 0.0;
+	float wobble_pos = 0.0;
+	float wobble_vel = 0.01;
 
 	// process events until window is closed
 	SDL_Event event;
@@ -89,27 +92,43 @@ int main() {
 		while (SDL_PollEvent(&event)) {
 
 			if (event.type == SDL_QUIT) {
+				
 				running = FALSE;
+
 			} else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
+
 				glViewport(0, 0, event.window.data1, event.window.data2);
 				update_screen_size(event.window.data1, event.window.data2);
+				screen_w = event.window.data1;
+				screen_h = event.window.data2;
+
+			} else if (event.type == SDL_MOUSEMOTION) {
+
+				float prev_mouse_u = mouse_u;
+
+				mouse_u = event.motion.x * 2.0 / screen_w - 1.0;
+				mouse_v = event.motion.y * 2.0 / screen_h - 1.0;
+
+				wobble_pos += (prev_mouse_u - mouse_u) * 0.15;
 			}
 		}
 
 		// draw layers
 		for (int i = 0; i < sizeof(layers) / sizeof(Layer *); i++) {
 
-			layers[i]->pivot_pitch = cos((t - 0.35) * 6) * 0.03;
-			layers[i]->pivot_yaw = sin(t * 3) * 0.65;
+			layers[i]->pivot_pitch = mouse_v * 0.6;
+			layers[i]->pivot_yaw = mouse_u * 0.6;
 
-			if (i <= 2 || i == 8 || i == 10) {
-				layers[i]->origin_roll = -cos((t - 0.1) * 3) * 0.13;
+			if (i == 2 || i == 8 || i == 10) {
+				layers[i]->origin_roll = wobble_pos;
 			}
 
 			draw_layer(layers[i]);
 		}
-
-		t += 0.02;
+		
+		wobble_pos += wobble_vel;
+		wobble_vel -= wobble_pos * 0.01;
+		wobble_vel *= 0.96;
 
 		// swap buffers
 		SDL_GL_SwapWindow(window);
