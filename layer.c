@@ -1,14 +1,14 @@
 static char *vertex =
 "#version 150 core\n"
-"uniform mat4 view_matrix;\n" // for correcting for screen stretch
-// "uniform mat4 move_matrix;\n" // for the various rotations/transformations associated with looking in different directions and stuff
-// "uniform float depth;\n"
+"uniform mat4 view_matrix;\n"
+// "uniform mat4 pivot_matrix;\n" // vtuber parts tend to pivot around a certain spot (e.g. head around neck), this matrix combines the relevant rotations/transformations to do that
+"uniform float depth;\n"
 "in vec2 position;\n"
 "in vec2 UV;\n"
 "out vec2 frag_UV;\n"
 "void main() {\n"
-    "gl_Position = view_matrix * vec4(position.xy, -1.0, 1.0);\n" // get final position
-    "frag_UV = UV;\n" // pass along UV
+    "gl_Position = view_matrix * vec4(position.xy, depth, 1.0);\n"
+    "frag_UV = UV;\n"
 "}";
 
 static char *fragment =
@@ -22,7 +22,7 @@ static char *fragment =
 
 static GLuint shader_program;
 
-static GLfloat view_matrix[4][4];
+static GLfloat view_matrix[4][4]; // for correcting for screen stretch
 
 typedef struct {
 
@@ -96,6 +96,8 @@ void draw_layer(const Layer *layer) {
 	// load the shader program and the uniforms we just calculated
 	glUseProgram(shader_program);
 	glUniformMatrix4fv(glGetUniformLocation(shader_program, "view_matrix"), 1, GL_FALSE, &view_matrix[0][0]);
+
+	glUniform1f(glGetUniformLocation(shader_program, "depth"), layer->depth);
 
 	// draw
 	glDrawArrays(GL_TRIANGLES, 0, layer->vertex_count);
