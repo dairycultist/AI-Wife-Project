@@ -57,10 +57,6 @@ Layer *create_layer(const float depth, const unsigned char *mesh_data, const int
 		exit(1);
 	}
 
-	const unsigned char *tex_data = surface->pixels;
-	const int tex_width = surface->w;
-	const int tex_height = surface->h;
-
 	// make vertex array
 	GLuint vertex_array;
 	glGenVertexArrays(1, &vertex_array);
@@ -100,7 +96,7 @@ Layer *create_layer(const float depth, const unsigned char *mesh_data, const int
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// write texture data
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_width, tex_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
 
 	// create final layer object to return
 	Layer *layer = malloc(sizeof(Layer));
