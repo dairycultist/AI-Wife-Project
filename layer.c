@@ -2,7 +2,7 @@ static char *vertex =
 "#version 150 core\n"
 "uniform float aspect_ratio;\n"
 "uniform vec3 rotation;\n"
-// "uniform vec3 pivot;\n"
+"uniform vec2 pivot;\n"
 "uniform float depth;\n"
 "in vec2 position;\n"
 "in vec2 UV;\n"
@@ -12,7 +12,7 @@ static char *vertex =
 	"float roll_sin = sin(rotation.x);\n"
 	"float roll_cos = cos(rotation.x);\n"
 	"mat3 roll = mat3(roll_cos, roll_sin, 0, -roll_sin, roll_cos, 0, 0, 0, 1.0);\n"
-    "gl_Position = vec4(roll * vec3(position.xy, depth), 1.0) * vec4(aspect_ratio, 1.0, 1.0, 1.0);\n"
+    "gl_Position = vec4(roll * vec3(position.xy - pivot, depth) + vec3(pivot, 0), 1.0) * vec4(aspect_ratio, 1.0, 1.0, 1.0);\n"
     "frag_UV = UV;\n"
 "}";
 
@@ -101,6 +101,7 @@ void draw_layer(const Layer *layer) {
 	// load shader uniforms
 	glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
 	glUniform3f(glGetUniformLocation(shader_program, "rotation"), 0.5, 0.0, 0.0);
+	glUniform2f(glGetUniformLocation(shader_program, "pivot"), 0.0, 1.0);
 	glUniform1f(glGetUniformLocation(shader_program, "depth"), layer->depth);
 
 	// draw
