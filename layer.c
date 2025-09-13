@@ -34,6 +34,7 @@ static char *fragment =
 "out vec4 outColor;\n"
 "void main() {\n"
 	"outColor = texture(tex, frag_UV);\n"
+	"if (outColor.a < 0.5) { discard; }\n"
 "}";
 
 static GLuint shader_program;
@@ -43,7 +44,6 @@ static float aspect_ratio; // for correcting for screen stretch
 typedef struct {
 
 	GLuint vertex_array; // "VAO"
-	uint vertex_count;
 	GLuint texture;
 	float depth;
 
@@ -117,7 +117,6 @@ Layer *create_layer(const float depth, const char *tex_path) {
 	// create final layer object to return
 	Layer *layer = malloc(sizeof(Layer));
 	layer->vertex_array = vertex_array;
-	layer->vertex_count = 6;
 	layer->texture = texture;
 	layer->depth = depth;
 
@@ -137,14 +136,14 @@ void draw_layer(const Layer *layer) {
 
 	// load shader uniforms
 	glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
-	glUniform3f(glGetUniformLocation(shader_program, "rotation"), sin(t * 1.2563), sin(t), 0.0);
+	glUniform3f(glGetUniformLocation(shader_program, "rotation"), sin(t * 1.2563) * 0.1, sin(t), 0.0);
 	glUniform2f(glGetUniformLocation(shader_program, "pivot"), 0.0, -0.5);
 	glUniform1f(glGetUniformLocation(shader_program, "depth"), layer->depth);
 
-	t += 0.02;
+	t += 0.01;
 
 	// draw
-	glDrawArrays(GL_TRIANGLES, 0, layer->vertex_count);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void initialize_shader() {

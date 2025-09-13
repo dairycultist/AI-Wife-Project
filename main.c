@@ -50,7 +50,15 @@ int main() {
 	update_screen_size(800, 400);
 	
 	// let programmer initialize stuff
-	Layer *layer = create_layer(0.0, "image.png");
+	Layer *layers[] = {
+		create_layer(-0.05, "tex_backhair.png"),
+		create_layer(-0.02, "tex_ears.png"),
+		create_layer(0.0, "tex_face.png"),
+		create_layer(0.02, "tex_eyes.png"),
+		create_layer(0.04, "tex_nose.png"),
+		create_layer(0.02, "tex_frills.png"),
+		create_layer(0.05, "tex_bangs.png"),
+	};
 
 	// process events until window is closed
 	SDL_Event event;
@@ -68,8 +76,10 @@ int main() {
 			}
 		}
 
-		// draw stuff
-		draw_layer(layer);
+		// draw layers
+		for (int i = 0; i < sizeof(layers) / sizeof(Layer *); i++) {
+			draw_layer(layers[i]);
+		}
 
 		// swap buffers
 		SDL_GL_SwapWindow(window);
