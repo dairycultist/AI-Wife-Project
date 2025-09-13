@@ -8,12 +8,19 @@ static char *vertex =
 "in vec2 UV;\n"
 "out vec2 frag_UV;\n"
 "void main() {\n"
+	"frag_UV = UV;\n"
 	// vtuber parts tend to pivot around a certain spot (e.g. head around neck), this matrix math combines the relevant rotations/transformations to do that
 	"float roll_sin = sin(rotation.x);\n"
 	"float roll_cos = cos(rotation.x);\n"
 	"mat3 roll = mat3(roll_cos, roll_sin, 0, -roll_sin, roll_cos, 0, 0, 0, 1.0);\n"
-    "gl_Position = vec4(roll * vec3(position.xy - pivot, depth) + vec3(pivot, 0), 1.0) * vec4(aspect_ratio, 1.0, 1.0, 1.0);\n"
-    "frag_UV = UV;\n"
+
+	"float yaw_sin = sin(rotation.y);\n"
+	"float yaw_cos = cos(rotation.y);\n"
+	"mat3 yaw = mat3(yaw_cos, 0, -yaw_sin, 0, 1.0, 0, yaw_sin, 0, yaw_cos);\n"
+
+	"vec3 rotated = (yaw * roll * vec3(position.xy - pivot, depth)) + vec3(pivot, 0);\n"
+
+    "gl_Position = vec4(rotated.xy, -1.0, 1.0) * vec4(aspect_ratio, 1.0, 1.0, 1.0);\n"
 "}";
 
 static char *fragment =
@@ -92,6 +99,8 @@ Layer *create_layer(const float depth, const unsigned char *mesh_data, const int
 	return layer;
 }
 
+float t = 0.0;
+
 void draw_layer(const Layer *layer) {
 
 	// bind the layer's vertex mesh and texture
@@ -100,9 +109,11 @@ void draw_layer(const Layer *layer) {
 
 	// load shader uniforms
 	glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
-	glUniform3f(glGetUniformLocation(shader_program, "rotation"), 0.5, 0.0, 0.0);
-	glUniform2f(glGetUniformLocation(shader_program, "pivot"), 0.0, 1.0);
+	glUniform3f(glGetUniformLocation(shader_program, "rotation"), 0.0, t, 0.0);
+	glUniform2f(glGetUniformLocation(shader_program, "pivot"), 0.0, 0.0);
 	glUniform1f(glGetUniformLocation(shader_program, "depth"), layer->depth);
+
+	t += 0.01;
 
 	// draw
 	glDrawArrays(GL_TRIANGLES, 0, layer->vertex_count);
