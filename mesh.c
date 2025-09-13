@@ -1,14 +1,14 @@
 // all 3D objects use the same hardcoded shader for simplicity
 static char *vertex =
 "#version 150 core\n"
-// "uniform mat4 view_matrix;\n" // for correcting for screen stretch
+"uniform mat4 view_matrix;\n" // for correcting for screen stretch
 // "uniform mat4 move_matrix;\n" // for the various rotations/transformations associated with looking in different directions and stuff
 // "uniform float depth;\n" // each mesh is placed on a different "layer" which rotates based on their layer depth
 "in vec2 position;\n"
 "in vec2 UV;\n"
 "out vec2 frag_UV;\n"
 "void main() {\n"
-    "gl_Position = vec4(position.xy, -1.0, 1.0);\n" // get final position
+    "gl_Position = view_matrix * vec4(position.xy, -1.0, 1.0);\n" // get final position
     "frag_UV = UV;\n" // pass along UV
 "}";
 
@@ -22,6 +22,8 @@ static char *fragment =
 "}";
 
 static GLuint shader_program;
+
+static GLfloat view_matrix[4][4];
 
 typedef struct {
 
@@ -92,7 +94,7 @@ void draw_mesh(const Mesh *mesh) {
 
 	// load the shader program and the uniforms we just calculated
 	glUseProgram(shader_program);
-	// glUniformMatrix4fv(glGetUniformLocation(shader_program, "position_matrix"), 1, GL_FALSE, &position_matrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader_program, "view_matrix"), 1, GL_FALSE, &view_matrix[0][0]);
 
 	// draw
 	glDrawArrays(GL_TRIANGLES, 0, mesh->vertex_count);
@@ -115,4 +117,12 @@ void initialize_shader() {
 
 	// apply changes to shader program (not gonna call "glUseProgram" yet bc not drawing)
 	glLinkProgram(shader_program);
+}
+
+void update_screen_size(int w, int h) {
+
+	view_matrix[0][0] = h / (float) w;
+	view_matrix[1][1] = 1;
+	view_matrix[2][2] = 1;
+	view_matrix[3][3] = 1;
 }
