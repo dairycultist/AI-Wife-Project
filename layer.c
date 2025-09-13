@@ -48,14 +48,7 @@ typedef struct {
 } Layer; // a layer is a mesh + a texture + a layer depth (used for rotation; every vertex on the same layer has the same depth, no depth testing needed, just draw painterly)
 
 // returns NULL on error
-Layer *create_layer(const float depth, const unsigned char *mesh_data, const int mesh_bytecount, const int mesh_vertcount, const char *tex_file) {
-
-	SDL_Surface *surface = IMG_Load(tex_file); // TODO dispose with SDL_FreeSurface()
-
-	if (surface->format->BytesPerPixel != 4) {
-		log_error("IMG_Load loaded with the wrong SDL_PixelFormat and now you have to program conversion :(");
-		exit(1);
-	}
+Layer *create_layer(const float depth, const unsigned char *mesh_data, const int mesh_bytecount, const int mesh_vertcount, const char *tex_path) {
 
 	// make vertex array
 	GLuint vertex_array;
@@ -95,8 +88,17 @@ Layer *create_layer(const float depth, const unsigned char *mesh_data, const int
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	// write texture data
+	// read image with SDL then write to the OpenGL texture
+	SDL_Surface *surface = IMG_Load(tex_path);
+
+	if (surface->format->BytesPerPixel != 4) {
+		log_error("IMG_Load loaded with the wrong SDL_PixelFormat and now you have to program conversion :(");
+		exit(1);
+	}
+
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+
+	SDL_FreeSurface(surface);
 
 	// create final layer object to return
 	Layer *layer = malloc(sizeof(Layer));
