@@ -64,6 +64,18 @@ int main() {
 		create_layer(0.12, "tex_bangs.png"),
 	};
 
+	for (int i = 0; i < sizeof(layers) / sizeof(Layer *); i++) {
+		layers[i]->pivot_y = -0.5;
+	}
+
+	layers[5]->x = -0.11;
+	layers[5]->y = -0.04;
+
+	layers[6]->x = 0.11;
+	layers[6]->y = -0.04;
+
+	layers[7]->y = -0.13;
+
 	float t = 0.0;
 
 	// process events until window is closed
@@ -84,7 +96,8 @@ int main() {
 
 		// draw layers
 		for (int i = 0; i < sizeof(layers) / sizeof(Layer *); i++) {
-			layers[i]->roll = sin(t * 1.2563) * 0.1;
+
+			layers[i]->roll = sin(t * 1.2563) * 0.2;
 			layers[i]->yaw = sin(t * 5) * 0.65;
 
 			// eyes yaw inwards more

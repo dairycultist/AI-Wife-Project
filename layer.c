@@ -1,8 +1,9 @@
 static char *vertex =
 "#version 150 core\n"
 "uniform float aspect_ratio;\n"
-"uniform vec3 rotation;\n"
+"uniform vec2 origin;\n"
 "uniform vec2 pivot;\n"
+"uniform vec3 rotation;\n"
 "uniform float depth;\n"
 "in vec2 position;\n"
 "in vec2 UV;\n"
@@ -18,7 +19,7 @@ static char *vertex =
 	"float yaw_cos = cos(rotation.y);\n"
 	"mat3 yaw = mat3(yaw_cos, 0, -yaw_sin, 0, 1.0, 0, yaw_sin, 0, yaw_cos);\n"
 
-	"vec3 rotated = (yaw * roll * vec3(position.xy - pivot, depth)) + vec3(pivot, 0);\n"
+	"vec3 rotated = (roll * yaw * vec3(position + origin - pivot, depth)) + vec3(pivot, 0);\n"
 
     "gl_Position = vec4(rotated.xy, -1.0, 1.0) * vec4(aspect_ratio, 1.0, 1.0, 1.0);\n"
 "}";
@@ -43,7 +44,7 @@ typedef struct {
 	GLuint texture;
 	float depth;
 
-	float layer_x, layer_y;
+	float x, y;
 	float pivot_x, pivot_y;
 	float roll, yaw, pitch;
 
@@ -122,8 +123,8 @@ Layer *create_layer(const float depth, const char *tex_path) {
 	layer->vertex_array = vertex_array;
 	layer->texture = texture;
 	layer->depth = depth;
-	layer->layer_x = 0.0;
-	layer->layer_y = 0.0;
+	layer->x = 0.0;
+	layer->y = 0.0;
 	layer->pivot_x = 0.0;
 	layer->pivot_y = 0.0;
 	layer->roll = 0.0;
@@ -144,6 +145,7 @@ void draw_layer(const Layer *layer) {
 
 	// load shader uniforms
 	glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
+	glUniform2f(glGetUniformLocation(shader_program, "origin"), layer->x, layer->y);
 	glUniform3f(glGetUniformLocation(shader_program, "rotation"), layer->roll, layer->yaw, layer->pitch);
 	glUniform2f(glGetUniformLocation(shader_program, "pivot"), layer->pivot_x, layer->pivot_y);
 	glUniform1f(glGetUniformLocation(shader_program, "depth"), layer->depth);
