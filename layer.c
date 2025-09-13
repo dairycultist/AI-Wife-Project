@@ -1,13 +1,18 @@
 static char *vertex =
 "#version 150 core\n"
 "uniform mat4 view_matrix;\n"
-// "uniform mat4 pivot_matrix;\n" // vtuber parts tend to pivot around a certain spot (e.g. head around neck), this matrix combines the relevant rotations/transformations to do that
+"uniform vec3 rotation;\n"
+// "uniform vec3 pivot;\n"
 "uniform float depth;\n"
 "in vec2 position;\n"
 "in vec2 UV;\n"
 "out vec2 frag_UV;\n"
 "void main() {\n"
-    "gl_Position = view_matrix * vec4(position.xy, depth, 1.0);\n"
+	// vtuber parts tend to pivot around a certain spot (e.g. head around neck), this matrix math combines the relevant rotations/transformations to do that
+	"float yaw_sin = sin(rotation.x);\n"
+	"float yaw_cos = cos(rotation.x);\n"
+	"mat3 yaw = mat3(yaw_cos, yaw_sin, 0, -yaw_sin, yaw_cos, 0, 0, 0, 1.0);\n"
+    "gl_Position = view_matrix * vec4(yaw * vec3(position.xy, depth), 1.0);\n"
     "frag_UV = UV;\n"
 "}";
 
@@ -95,6 +100,7 @@ void draw_layer(const Layer *layer) {
 
 	// load shader uniforms
 	glUniformMatrix4fv(glGetUniformLocation(shader_program, "view_matrix"), 1, GL_FALSE, &view_matrix[0][0]);
+	glUniform3f(glGetUniformLocation(shader_program, "rotation"), 0.5, 0.0, 0.0);
 	glUniform1f(glGetUniformLocation(shader_program, "depth"), layer->depth);
 
 	// draw
