@@ -48,7 +48,18 @@ typedef struct {
 } Layer; // a layer is a mesh + a texture + a layer depth (used for rotation; every vertex on the same layer has the same depth, no depth testing needed, just draw painterly)
 
 // returns NULL on error
-Layer *create_layer(const float depth, const unsigned char *mesh_data, const int mesh_bytecount, const int mesh_vertcount, const unsigned char *tex_data, const int tex_width, const int tex_height) {
+Layer *create_layer(const float depth, const unsigned char *mesh_data, const int mesh_bytecount, const int mesh_vertcount, const char *tex_file) {
+
+	SDL_Surface *surface = IMG_Load(tex_file); // TODO dispose with SDL_FreeSurface()
+
+	if (surface->format->BytesPerPixel != 4) {
+		log_error("IMG_Load loaded with the wrong SDL_PixelFormat and now you have to program conversion :(");
+		exit(1);
+	}
+
+	const unsigned char *tex_data = surface->pixels;
+	const int tex_width = surface->w;
+	const int tex_height = surface->h;
 
 	// make vertex array
 	GLuint vertex_array;
