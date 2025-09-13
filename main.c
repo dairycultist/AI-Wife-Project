@@ -51,21 +51,21 @@ int main() {
 	
 	// let programmer initialize stuff
 	Layer *layers[] = {
-		create_layer(-0.32, "tex_backerhair.png"),
-		create_layer(-0.15, "tex_backhair.png"),
-		create_layer(-0.05, "tex_sidefrills.png"),
-		create_layer(-0.03, "tex_ears.png"),
-		create_layer(0.0, "tex_face.png"),
-		create_layer(0.07, "tex_eyeleft.png"),
-		create_layer(0.07, "tex_eyeright.png"),
-		create_layer(0.1, "tex_nose.png"),
-		create_layer(0.06, "tex_frills.png"),
-		create_layer(0.06, "tex_baseofbangs.png"),
-		create_layer(0.12, "tex_bangs.png"),
+		create_layer(-0.27, "tex_backerhair.png"),
+		create_layer(-0.10, "tex_backhair.png"),
+		create_layer(0.0, "tex_sidefrills.png"),
+		create_layer(0.02, "tex_ears.png"),
+		create_layer(0.05, "tex_face.png"),
+		create_layer(0.12, "tex_eyeleft.png"),
+		create_layer(0.12, "tex_eyeright.png"),
+		create_layer(0.15, "tex_nose.png"),
+		create_layer(0.11, "tex_frills.png"),
+		create_layer(0.11, "tex_baseofbangs.png"),
+		create_layer(0.17, "tex_bangs.png"),
 	};
 
 	for (int i = 0; i < sizeof(layers) / sizeof(Layer *); i++) {
-		layers[i]->pivot_y = -0.5;
+		layers[i]->pivot_y = -0.3;
 	}
 
 	layers[5]->origin_x = -0.11;
@@ -99,9 +99,9 @@ int main() {
 		// draw layers
 		for (int i = 0; i < sizeof(layers) / sizeof(Layer *); i++) {
 
-			layers[i]->pivot_roll = sin(t * 0.4) * 0.3;
-			layers[i]->pivot_pitch = sin(t) * 0.3;
-			layers[i]->pivot_yaw = sin(t * 1.23) * 0.6;
+			// layers[i]->pivot_roll = sin(t * 0.4) * 0.3;
+			layers[i]->pivot_pitch = sin(t * 3) * 0.4;
+			// layers[i]->pivot_yaw = sin(t * 1.23) * 0.6;
 
 			draw_layer(layers[i]);
 		}
